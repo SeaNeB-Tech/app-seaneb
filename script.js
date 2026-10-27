@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * SeaNeB Business Applications Portal — Controller
+ * Seaneb Business Applications Portal — Controller
  * ============================================================================
  *
  * Products are now loaded dynamically from SeaNebAPI (api.js).
@@ -18,11 +18,17 @@ const ICON_SVG = {
     <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
     <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
   </svg>`,
-  'seaneb': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <path d="M3 9l2-5h14l2 5"/>
-    <path d="M21 9v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9"/>
-    <path d="M3 9h18"/>
-    <path d="M9 22V12h6v10"/>
+  'seaneb': `<svg width="28" height="28" viewBox="0 0 40 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <linearGradient id="seanebRainbowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#00E676"/>
+        <stop offset="25%" stop-color="#FFEA00"/>
+        <stop offset="45%" stop-color="#FF1744"/>
+        <stop offset="70%" stop-color="#D500F9"/>
+        <stop offset="100%" stop-color="#2979FF"/>
+      </linearGradient>
+    </defs>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M20 2C10.059 2 2 10.059 2 20C2 26.5 6 32 18 41.5V26.5C15.5 26.5 13.5 24.5 13.5 22C13.5 18.41 16.41 15.5 20 15.5C23.59 15.5 26.5 18.41 26.5 22C26.5 24.5 24.5 26.5 22 26.5V41.5C34 32 38 26.5 38 20C38 10.059 29.941 2 20 2Z" fill="url(#seanebRainbowGrad)"/>
   </svg>`,
   'auto': `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.1 2 11.5 2 12v4c0 .6.4 1 1 1h2"/>
@@ -213,10 +219,16 @@ document.addEventListener('DOMContentLoaded', () => {
         </span>
       `;
 
-      // Use logo image if available from API, else fall back to SVG icon
-      const hasRealIcon = product.iconUrl && product.iconUrl.startsWith('http');
+      // Use logo image if available from API/local assets, else fall back to SVG icon
+      const hasRealIcon = Boolean(product.iconUrl && (
+        product.iconUrl.startsWith('http') ||
+        product.iconUrl.startsWith('assets/') ||
+        product.iconUrl.startsWith('./assets/') ||
+        product.iconUrl.startsWith('/assets/') ||
+        product.iconUrl.startsWith('data:')
+      ));
       const iconHtml = hasRealIcon
-        ? `<img src="${escapeHtml(product.iconUrl)}" alt="${escapeHtml(product.name)} icon" class="tile-icon-img" width="28" height="28" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        ? `<img src="${escapeHtml(product.iconUrl)}" alt="${escapeHtml(product.name)} icon" class="tile-icon-img" width="32" height="32" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
            <span class="icon-svg-fallback" style="display:none">${iconSvg}</span>`
         : iconSvg;
 
@@ -328,7 +340,11 @@ document.addEventListener('DOMContentLoaded', () => {
     showSkeletonLoading(3);
 
     try {
-      const products = await SeaNebAPI.ProductService.getProducts();
+      const api = window.SeanebAPI || window.SeaNebAPI;
+      if (!api || !api.ProductService) {
+        throw new Error('SeanebAPI service is not initialized');
+      }
+      const products = await api.ProductService.getProducts();
       state.allProducts = products;
       state.isLoading = false;
       renderProducts(products);

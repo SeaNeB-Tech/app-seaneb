@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SeaNeB Business Applications Portal — Design System & Stylesheet
+   Seaneb Business Applications Portal — Design System & Stylesheet
    Modern, Accessible, Production-Quality SaaS Ecosystem
    ========================================================================== */
 
@@ -527,6 +527,13 @@ input {
   justify-content: center;
 }
 
+.mini-tile-icon img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
+}
+
 .bg-slate-dark { background-color: #212529; color: #FFFFFF; }
 .bg-slate { background-color: #495057; color: #FFFFFF; }
 .bg-slate-warm { background-color: #343A40; color: #FFFFFF; }
@@ -920,7 +927,7 @@ input {
   flex-grow: 1;
 }
 
-/* Optional Secondary Note (e.g. Mobile app: SeaNeB Daily) */
+/* Optional Secondary Note (e.g. Mobile app: Seaneb Daily) */
 .product-meta-note {
   display: inline-flex;
   align-items: center;
@@ -1546,8 +1553,13 @@ input {
    17. Tile icon image (from API)
    -------------------------------------------------------------------------- */
 .tile-icon-img {
+  width: 32px;
+  height: 32px;
+  max-width: 32px;
+  max-height: 32px;
   object-fit: contain;
   border-radius: 6px;
+  display: block;
 }
 
 .icon-svg-fallback {

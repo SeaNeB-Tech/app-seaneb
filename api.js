@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * SeaNeb.app — Client API Service & Integration Module
+ * Seaneb.app — Client API Service & Integration Module
  * ============================================================================
  *
  * ARCHITECTURE OVERVIEW:
@@ -10,7 +10,7 @@
  *                     ▼
  *           Business Apps Portal Grid / Category Filter
  *
- * This module manages all asynchronous data interactions for SeaNeb.app.
+ * This module manages all asynchronous data interactions for Seaneb.app.
  * App product metadata is dynamically loaded from backend APIs.
  * No product data is hardcoded into HTML — any backend change reflects
  * seamlessly across the UI without frontend code edits.
@@ -27,7 +27,9 @@
   } else if (typeof module === 'object' && module.exports) {
     module.exports = factory();
   } else {
-    root.SeaNebAPI = factory();
+    const instance = factory();
+    root.SeanebAPI = instance;
+    root.SeaNebAPI = instance;
   }
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
@@ -84,14 +86,14 @@
    * Known canonical URLs for ecosystem products
    */
   const CANONICAL_URLS = {
-    'seaneb':    'https://seaneb.com',
-    'seaneb-app':'https://www.seaneb.org/seaneb-app',
-    'jobs':      'https://jobs.seaneb.com',
+    'seaneb':    'https://seaneb.app/',
+    'seaneb-app':'https://seaneb.app/',
+    'jobs':      'http://jobs.seaneb.app/',
     'auto':      'https://auto.seaneb.app/',
     'news':      'https://news.seaneb.app/',
     'trip':      'https://trip.seaneb.app/',
     'ngo':       'https://ngo.seaneb.app/',
-    'tiffin':    'https://tiffinservice.app',
+    'tiffin':    'https://tiffin.seaneb.app/',
     'property':  'https://www.seaneb.org/',
     'arthyam':   'https://www.seaneb.org/'
   };
@@ -119,24 +121,26 @@
   const DEFAULT_BUSINESS_APPS = [
     {
       product_key: 'seaneb',
-      name: 'SeaNeB',
+      name: 'Seaneb',
       audience: 'Local businesses, shops and consumers',
       description: 'Search your local economy. Discover stores, explore products and connect with local businesses.',
-      displayUrl: 'seaneb.com',
-      href: 'https://seaneb.com',
-      ctaLabel: 'Open SeaNeB',
+      displayUrl: 'seaneb.app',
+      href: 'https://seaneb.app/',
+      ctaLabel: 'Open Seaneb',
       status: 'available',
       category: 'local-discovery',
+      icon: 'assets/images/seaneb-icon.png',
+      logo: 'assets/images/seaneb-logo.png',
       iconSvgKey: 'seaneb'
     },
     {
       product_key: 'jobs',
-      name: 'SeaNeB Jobs',
+      name: 'Seaneb Jobs',
       audience: 'Employers, recruiters and job seekers',
       description: 'Manage job openings, discover candidates and simplify recruitment.',
-      displayUrl: 'jobs.seaneb.com',
-      href: 'https://jobs.seaneb.com',
-      ctaLabel: 'Open SeaNeB Jobs',
+      displayUrl: 'jobs.seaneb.app',
+      href: 'http://jobs.seaneb.app/',
+      ctaLabel: 'Open Seaneb Jobs',
       status: 'available',
       category: 'business-hiring',
       icon: 'in/product/jobs/favicon/jobs-favicon.webp',
@@ -149,10 +153,10 @@
       name: 'Tiffin Service',
       audience: 'Tiffin providers and meal-service businesses',
       description: 'Manage meal plans, subscriptions and daily tiffin services.',
-      displayUrl: 'tiffinservice.app',
-      href: 'https://tiffinservice.app',
+      displayUrl: 'tiffin.seaneb.app',
+      href: 'https://tiffin.seaneb.app/',
       ctaLabel: 'Open Tiffin Service',
-      secondaryLabel: 'Mobile app: SeaNeB Daily',
+      secondaryLabel: 'Mobile app: Seaneb Daily',
       status: 'available',
       category: 'food-services',
       icon: 'in/product/tiffin/favicon/tiffin-favicon.png',
@@ -206,7 +210,7 @@
         try {
           data = await fetchWithTimeout(primaryEndpoint);
         } catch (errPrimary) {
-          console.warn(`[SeaNeb API] ${primaryEndpoint} unavailable, trying fallback:`, errPrimary.message);
+          console.warn(`[Seaneb API] ${primaryEndpoint} unavailable, trying fallback:`, errPrimary.message);
           data = await fetchWithTimeout(fallbackEndpoint);
         }
 
@@ -217,7 +221,7 @@
 
         const allNormalized = this.normalizeProducts(rawList);
         
-        // Return exactly 3 products as requested: SeaNeB, SeaNeB Jobs, Tiffin Service
+        // Return exactly 3 products as requested: Seaneb, Seaneb Jobs, Tiffin Service
         const FEATURED_KEYS = ['seaneb', 'jobs', 'tiffin'];
         const featured = FEATURED_KEYS
           .map(k => allNormalized.find(p => p.key === k))
@@ -228,9 +232,9 @@
         }
         return allNormalized.slice(0, 3);
       } catch (error) {
-        console.warn(`[SeaNeb API] Could not fetch products:`, error.message);
+        console.warn(`[Seaneb API] Could not fetch products:`, error.message);
         if (API_CONFIG.ENABLE_FALLBACK_DATA) {
-          console.info('[SeaNeb API] Using built-in business apps configuration.');
+          console.info('[Seaneb API] Using built-in business apps configuration.');
           return this.normalizeProducts(DEFAULT_BUSINESS_APPS);
         }
         throw error;
@@ -256,11 +260,11 @@
             webUrl = CANONICAL_URLS[key] || '#';
           }
 
-          const iconPath = p.icon || p.favicon_url || '';
-          const logoPath = p.logo || p.logo_url || '';
-
           // Merge with local fallback data for richer display
           const localFallback = DEFAULT_BUSINESS_APPS.find(d => d.product_key === key);
+
+          const iconPath = p.icon || p.favicon_url || localFallback?.icon || (key === 'seaneb' ? 'assets/images/seaneb-icon.png' : '');
+          const logoPath = p.logo || p.logo_url || localFallback?.logo || (key === 'seaneb' ? 'assets/images/seaneb-logo.png' : '');
 
           // Prefer local metadata for display fields, fallback to API data
           const audience = p.audience || localFallback?.audience || p.tagline || '';
@@ -313,10 +317,9 @@
    */
   const BrandService = {
     async getBrandLogos() {
-      const pinIconUrl = 'https://www.seaneb.com/images/logo/apple-touch-icon.png';
       return {
         headerLogo: 'assets/images/seaneb-logo.png',
-        heroBrandIcon: pinIconUrl,
+        heroBrandIcon: 'assets/images/seaneb-icon.png',
         heroBrandIconFallback: 'assets/images/seaneb-icon.png'
       };
     }
@@ -337,7 +340,7 @@
       try {
         return await fetchWithTimeout(endpoint);
       } catch (err) {
-        console.warn(`[SeaNeb API] Search request error:`, err.message);
+        console.warn(`[Seaneb API] Search request error:`, err.message);
         return {
           status: 'local',
           query,
