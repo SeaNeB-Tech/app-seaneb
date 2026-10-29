@@ -263,8 +263,8 @@
           // Merge with local fallback data for richer display
           const localFallback = DEFAULT_BUSINESS_APPS.find(d => d.product_key === key);
 
-          const iconPath = p.icon || p.favicon_url || localFallback?.icon || (key === 'seaneb' ? 'assets/images/seaneb-icon.png' : '');
-          const logoPath = p.logo || p.logo_url || localFallback?.logo || (key === 'seaneb' ? 'assets/images/seaneb-logo.png' : '');
+          const iconPath = p.icon || p.favicon_url || localFallback?.icon || (key === 'seaneb' ? 'assets/images/seaneb-icon.png' : (key === 'jobs' ? 'assets/images/jobs.svg' : (key === 'tiffin' ? 'assets/images/tiffin.svg' : '')));
+          const logoPath = p.logo || p.logo_url || localFallback?.logo || (key === 'seaneb' ? 'assets/images/seaneb-logo.png' : (key === 'jobs' ? 'assets/images/jobs.svg' : (key === 'tiffin' ? 'assets/images/tiffin.svg' : '')));
 
           // Prefer local metadata for display fields, fallback to API data
           const audience = p.audience || localFallback?.audience || p.tagline || '';
